@@ -1,0 +1,104 @@
+﻿@page "/Friendlist"
+@using static Chats.Client.Pages.User.Chatss
+@inject HttpClient client
+@inject NavigationManager NavigationManager
+
+<h3>Friendlist</h3>
+@if(status ==0)
+{
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Имя</th>
+            <th scope="col">деиствие</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in friend)
+        {
+            <tr>
+                <th scope="row">@item.Nomer</th>
+                <td>@item.Name</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                        <button type="button" class="btn btn-success" @onclick="() => Buy(item.IdUser,item.Name)">начать новое общение</button>
+                        <button type="button" class="btn btn-warning">отправить личное сообщение</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+    </table>
+}
+else
+{
+    <Chatss />
+}
+@code {
+    private IList<Friend> friend = StaticClass.friend;
+    private int status=0;
+    private async void Buy(int IDUsers,string IDName)
+    {
+        var response1 = await client.GetFromJsonAsync<_String>($"/Chats/Create?Namechat={"НовыйЧатС" + IDName}&Сreator={StaticClass.ID}");
+        string chatspozition = response1.txt;
+
+        int y = Convert.ToInt32(IDUsers), y2 = Convert.ToInt32(chatspozition);
+        var response3 = await client.GetFromJsonAsync<_String>($"/Users/LogChat?idUser={y}&idchat={y2}");
+        string user5 = response3.txt;
+        var response4 = await client.GetFromJsonAsync<_String>($"/Chats/AddUser?idchat={y2}&idUser={y}");
+        string user6 = response4.txt;
+        // var lastElement = StaticClass.chats[StaticClass.chats.Count - 1];
+        // Chats2 chats2 = new Chats2() { Id = lastElement.Id + 1, IdChats = chatspozition, Name = "НовыйЧатС" + IDName };
+        // StaticClass.chats.Add(chats2);
+        status = 1;
+        StateHasChanged();
+    }
+
+    // private async void Buy2()
+    // {
+    //     try
+    //     {
+    //         int uuu = StaticClass.PagePhases;
+    //         StaticClass.chats.Clear();
+    //         if (StaticClass.InhichChats != "")
+    //         {
+    //             var response1 = await client.GetFromJsonAsync<_String>($"/Users/AboutClient?ID={StaticClass.ID}");
+    //             string user = response1.txt;
+    //             string[] user2 = user.Split(' ');
+    //             StaticClass.InhichChats = user2[3];
+    //         }
+    //         var response = await client.GetFromJsonAsync<_String>($"/Chats/ExistingSelect?IDChats={StaticClass.InhichChats}");
+    //         string chat = response.txt;
+    //         string[] chat2 = chat.Split(' ');
+    //         chat2 = chat2.Where((value, index) => index != 0).ToArray();
+    //         if (chat2.Length == 2)
+    //             for (int i = 0, j = 1; i < chat2.Length; i += 2, j++)
+    //             {
+    //                 Chats2 chats2 = new Chats2() { Id = j, IdChats = chat2[i], Name = chat2[i + 1] };
+    //                 StaticClass.chats.Add(chats2);
+    //             }
+    //         else
+    //             for (int i = 0, j = 1; i < chat2.Length - 1; i += 2, j++)
+    //             {
+    //                 Chats2 chats2 = new Chats2() { Id = j, IdChats = chat2[i], Name = chat2[i + 1] };
+    //                 StaticClass.chats.Add(chats2);
+    //             }
+
+    //     }
+    //     catch { }
+    //     StateHasChanged();
+    // }
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var response1 = await client.GetFromJsonAsync<IList<Friend>>($"/Users/Select2?ID={StaticClass.ID}");
+    //     friend = response1;
+    //     // foreach (var i in friend)
+    //     // {
+    //     //     fri.IdUser
+    //     //     friend.IdUser = i.ID;
+    //     //     friend.Add(friend);
+    //     // }
+    //     StateHasChanged();
+    // }
+}

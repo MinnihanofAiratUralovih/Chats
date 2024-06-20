@@ -1,0 +1,541 @@
+﻿@page "/Chatss"
+@inject HttpClient client
+@inject NavigationManager NavigationManager
+
+<div class="btn-group">
+    @*<div class="form-group">*@
+    <div class="modal-dialog modal-dialog-scrollable left-side-element" style="width: 100%; height: 100%;">
+        <div class="modal-content left-side-element" style=" width: 100%; height: 100%; ">
+            <div class="modal-body">
+
+
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+
+
+                            <table class="table table-striped">
+                                <thead class="table-danger">
+                                    <tr>
+                                        <th scope="col" style="width: 100px">&nbsp;&nbsp;№&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Имя</th>
+                                    </tr>
+                                </thead>
+                                @try
+                                {
+                                    @foreach (var item in chats)
+                                    {
+                                        <tbody>
+                                            <tr>
+                                                <button class="btn btn-primary list-group-item list-group-item-action active" @onclick="(() => Buy(item))">
+                                                    @item.Id &nbsp;&nbsp;&nbsp;&nbsp;@item.Name
+                                                </button>
+                                            </tr>
+                                        </tbody>
+                                    }
+                                }
+                                catch { }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="modal-dialog modal-dialog-scrollable left-side-element" style="max-width: 800px; width: 100%; height: 450px;">
+            <div class="modal-content left-side-element" style="max-width: 800px; width: 100%; height: 450px;">
+                @switch (IsModalVisible)
+                {
+                    case 0:
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col">
+
+
+                                        <table class="table table-striped">
+                                            <thead class="table-danger table-layout: fixed">
+                                                <tr>
+                                                    <th scope="col" style="width: 400px">@NameChatsTxt</th>
+                                                    <th scope="col" style="width: 400px"></th>
+                                                    <th scope="col"></th>
+                                                </tr>
+                                            </thead>
+                                            @try
+                                            {
+                                                @foreach (var item in txt)//поменять на запись текста
+                                                {
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                @item.Text
+                                                            </td>
+                                                            <td>
+                                                                @item.Text2
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-primary" @onclick="(() => Buy2(item))">удалить</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                }
+                                            }
+                                            catch { }
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        break;
+                    case 1:
+                        <tr>
+                            <td>
+                                <h3>создание нового чата</h3>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" style="width: 100px" @onclick="CloseBox">Закрыть</button>
+                            </td>
+                        </tr>
+                        <h>имя чата</h>
+                        <input name="Login" style="width: 200px" @bind="namechat"></input>
+                        <button class="btn btn-primary" style="width: 100px" @onclick="Buy5">создать</button>
+                        break;
+                    case 2:
+                        <div class="modal-dialog modal-dialog-scrollable left-side-element" style=" position: absolute; top: -30px; left: 0; max-width: 300px; width: 100%; height: 455px;">
+                            <div class="modal-content left-side-element" style="max-width: 300px; width: 100%; height: 450px; ">
+
+
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col">
+                                            <table class="table table-striped">
+                                                <thead class="table-danger">
+                                                    <tr>
+                                                        <th scope="col" style="width: 100px">№</th>
+                                                        <th scope="col" style="width: 200px">Имя</th>
+                                                        <th scope="col" style="width: 100px"></th>
+                                                    </tr>
+                                                </thead>
+                                                @try
+                                                {
+                                                    @foreach (var item in user0)
+                                                    {
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    @item.Id
+                                                                </td>
+                                                                <td>
+                                                                    @item.Name
+                                                                </td>
+                                                                <td>
+                                                                    <input type="checkbox" name="options" value="option1" @onclick="() => Buy8(item.IDUsers)" />
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    }
+                                                }
+                                                catch { }
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div style=" position: absolute; top: 0; left: 300px;">
+                            <tr>
+                                <td>
+                                    Добавить нового человека
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" style="width: 100px" @onclick="CloseBox">Закрыть</button>
+                                </td>
+                            </tr>
+                            <br /><br />
+                            <button class="btn btn-primary" style="width: 100px" @onclick="Buy9">Добавить</button>
+                        </div>
+                        break;
+                    case 3://переделать на удаление людей
+                        <div class="modal-dialog modal-dialog-scrollable left-side-element" style=" position: absolute; top: -30px; left: 0; max-width: 300px; width: 100%; height: 455px;">
+                            <div class="modal-content left-side-element" style="max-width: 300px; width: 100%; height: 450px; ">
+
+
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col">
+                                            <table class="table table-striped">
+                                                <thead class="table-danger">
+                                                    <tr>
+                                                        <th scope="col" style="width: 100px">№</th>
+                                                        <th scope="col" style="width: 200px">Имя</th>
+                                                        <th scope="col" style="width: 100px"></th>
+                                                    </tr>
+                                                </thead>
+                                                @try
+                                                {
+                                                    @foreach (var item in user0)
+                                                    {
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    @item.Id
+                                                                </td>
+                                                                <td>
+                                                                    @item.Name
+                                                                </td>
+                                                                <td>
+                                                                    <input type="checkbox" name="options" value="option1" @onclick="() => Buy8(item.IDUsers)" />
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    }
+                                                }
+                                                catch { }
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div style=" position: absolute; top: 0; left: 300px;">
+                            <tr>
+                                <td>
+                                    Редактор чата
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" style="width: 100px" @onclick="CloseBox">Закрыть</button>
+                                </td>
+                            </tr>
+                            <br /><br />
+                            <button class="btn btn-primary" style="width: 100px" @* @onclick="Buy11" *@>удалить людей</button>
+                            <br /><br />
+                            <tr>
+                                <input type="text" name="Login" @bind="ChatNewName" />
+                                <button class="btn btn-primary" style="width: 100px" @onclick="Buy12">Изменить имя</button>
+                            </tr>
+                        </div>
+                        break;
+                }
+
+
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <textarea name="Login" style="width: 600px" @bind="txtSending"></textarea>
+            <button class="btn btn-primary" @onclick="Buy3">отправить</button>
+            <span />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="modal-dialog modal-dialog-scrollable left-side-element" style="max-width: 300px; width: 100%; height: 450px;">
+            <div class="modal-content left-side-element" style="max-width: 300px; width: 100%; height: 450px; ">
+
+                <button class="btn btn-primary" @onclick="Buy4">создать новый чат</button>
+                <br /><br />
+                @if (point1)
+                {
+                    <button class="btn btn-primary" @onclick="Buy6">удалить текущий чат</button>
+                    <br />
+
+                    <br />
+                    <button class="btn btn-primary" @onclick="Buy7">пригласить новых людей</button>
+                    <br />
+
+                    <br />
+                    <button class="btn btn-primary" @onclick="Buy10">Редактировать чат</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private IList<Chats2> chats => StaticClass.chats;
+    private IList<txt2> txt => StaticClass.txt;
+    private IList<user2> user0 => StaticClass.user0;
+    string InhichChats = StaticClass.InhichChats;
+    string txtSending = "";//текст отправки
+    string chatspozition = "", chatspozition2 = "";//позиия чата 1(из бд) 2(текущий)
+    int IsModalVisible = 0;
+    string namechat = "";
+    string iDUsers = StaticClass.ID;
+    bool isChecked = false;
+    private IList<string> masIDUsers => StaticClass.masIDUsers;
+    private string NameChatsTxt = "";//текс головы заиденного сообщества
+    private bool point1 = false;
+    private string ChatNewName = "";
+
+    protected override async Task OnInitializedAsync()//protected override void OnInitialized()
+    {
+        try
+        {
+            int uuu = StaticClass.PagePhases;
+            StaticClass.chats.Clear();
+            StaticClass.txt.Clear();
+            if (InhichChats != "")
+            {
+                var response1 = await client.GetFromJsonAsync<_String>($"/Users/AboutClient?ID={iDUsers}");
+                string user = response1.txt;
+                string[] user2 = user.Split(' ');
+                StaticClass.InhichChats = user2[3];
+            }
+            var response = await client.GetFromJsonAsync<_String>($"/Chats/ExistingSelect?IDChats={InhichChats}");
+            string chat = response.txt;
+            string[] chat2 = chat.Split(' ');
+            chat2 = chat2.Where((value, index) => index != 0).ToArray();
+            if (chat2.Length == 2)
+                for (int i = 0, j = 1; i < chat2.Length; i += 2, j++)
+                {
+                    Chats2 chats2 = new Chats2() { Id = j, IdChats = chat2[i], Name = chat2[i + 1] };
+                    StaticClass.chats.Add(chats2);
+                }
+            else
+                for (int i = 0, j = 1; i < chat2.Length - 1; i += 2, j++)
+                {
+                    Chats2 chats2 = new Chats2() { Id = j, IdChats = chat2[i], Name = chat2[i + 1] };
+                    StaticClass.chats.Add(chats2);
+                }
+
+        }
+        catch { }
+        StateHasChanged();
+    }
+
+    private async void Buy(Chats2 product)//переход по чатам
+    {
+        try
+        {
+            NameChatsTxt = product.Name;
+            StaticClass.txt.Clear();
+            var response = await client.GetFromJsonAsync<_String>($"/Storage/Get2?IDChat={product.IdChats}");
+            string chat = response.txt;
+            string[] chat2 = chat.Split(' ');
+            chatspozition = product.IdChats;
+            chatspozition2 = product.Id.ToString();
+            for (int i = 0; i < chat2.Length + 1; i++)
+                if (chat2[i] != "")
+                {
+                    if (chat2[i] == "0" || chat2[i] == "0")
+                        break;
+                    var response2 = await client.GetFromJsonAsync<_String>($"/Storage/Get3?IDChat={chat2[i]}");
+                    string chat3 = response2.txt;
+                    var response4 = await client.GetFromJsonAsync<_String>($"/Storage/Get4?IDChat={chat2[i]}");
+                    string chat4 = response4.txt;
+                    if (chat3 == "")
+                        break;
+                    txt2 txt2 = new txt2();
+                    if (chat4 == StaticClass.ID)
+                        txt2 = new txt2() { Id = i, Text2 = chat3, IDUsers = chat4 };
+                    else
+                        txt2 = new txt2() { Id = i, Text = chat3, IDUsers = chat4 };
+                    StaticClass.txt.Add(txt2);
+                }
+            var response5 = await client.GetFromJsonAsync<Chats>($"/Chats/Get?customersID={chatspozition}");
+            if (StaticClass.ID == response5.Сreator)
+                point1 = true;
+        }
+        catch { }
+        IsModalVisible = 0;
+        StateHasChanged();
+    }
+
+    private async void Buy2(txt2 product)//система удаления
+    {
+
+    }
+
+    private async void Buy3()
+    {
+        if (txtSending != "")
+        {
+            txt2 txt2 = new txt2();
+            txt2 = new txt2() { Id = Convert.ToInt32(txt.Count), Text2 = txtSending, IDUsers = StaticClass.ID };
+            StaticClass.txt.Add(txt2);
+            var response = await client.GetFromJsonAsync<_String>($"/Storage/Get5?IDChats={chatspozition}&IDUsers={iDUsers}&Text={txtSending}");
+            string chat3 = response.txt;
+            StateHasChanged();
+        }
+    }
+
+    private async void Buy4()
+    {
+        IsModalVisible = 1;
+    }
+
+    private void CloseBox()
+    {
+        IsModalVisible = 0;
+    }
+
+    private async void Buy5()//создать новый чат
+    {
+        if (namechat != "")
+        {
+            var response = await client.GetFromJsonAsync<_String>($"/Chats/Create?Namechat={namechat}&Сreator={iDUsers}");
+            string chat = response.txt;
+            Chats2 chats2 = new Chats2() { Id = chats.Count + 1, IdChats = chat, Name = namechat };
+            StaticClass.chats.Add(chats2);
+            IsModalVisible = 0;
+            StateHasChanged();
+        }
+    }
+
+    private async void Buy6()//удалить текущий чат
+    {
+        var response = await client.GetFromJsonAsync<_String>($"/Chats/Delete?IDChats={chatspozition}&IDUser={StaticClass.ID}");
+        string chat = response.txt;
+        StaticClass.chats.RemoveAt(Convert.ToInt32(Convert.ToInt32(chatspozition2) - 1));
+        point1 = false;
+        StateHasChanged();
+    }
+
+    private async void Buy7()
+    {
+        if (chatspozition != null)
+        {
+            StaticClass.user0.Clear();
+            var response = await client.GetFromJsonAsync<_String>($"/Chats/ChatUsers?IDChat={chatspozition}");
+            string user = response.txt;
+            var response2 = await client.GetFromJsonAsync<_String>($"/Users/Taketherest?masUsers2={user}");
+            string user3 = response2.txt;
+            string[] user4 = user3.Split(' ');
+            int j = 1;
+            if (user4.Length != 0)
+            {
+                foreach (var i in user4)
+                {
+                    var response3 = await client.GetFromJsonAsync<_String>($"/Users/AboutClient?ID={i}");
+                    string user5 = response3.txt;
+                    string[] user6 = user5.Split(' ');
+                    user2 user2 = new user2() { Id = j, IDUsers = user6[0], Name = user6[1] };
+                    j++;
+                    StaticClass.user0.Add(user2);
+                }
+            }
+            IsModalVisible = 2;
+        }
+        StateHasChanged();
+    }
+
+    private async void Buy8(string IDUsers)
+    {
+        bool containsWord = masIDUsers.Any(word => word == IDUsers);
+        if (containsWord)
+        {
+            string[] IDUsers1 = new string[1];
+            IDUsers1[0] = IDUsers;
+            StaticClass.masIDUsers = masIDUsers.Except(IDUsers1).ToArray();
+        }
+        else
+        {
+            StaticClass.masIDUsers.Add(IDUsers);
+        }
+        StateHasChanged();
+    }
+
+    private async void Buy9()
+    {
+        IList<user2> user1 = new List<user2>();
+        foreach (var i in masIDUsers)
+        {
+            int y = Convert.ToInt32(i), y2 = Convert.ToInt32(chatspozition);
+            var response3 = await client.GetFromJsonAsync<_String>($"/Users/LogChat?idUser={y}&idchat={y2}");
+            string user5 = response3.txt;
+            var response4 = await client.GetFromJsonAsync<_String>($"/Chats/AddUser?idchat={y2}&idUser={y}");
+            string user6 = response4.txt;
+            var variable = user0.Where(x => x.IDUsers == i).FirstOrDefault();
+            user1.Add(variable);
+        }
+        StaticClass.user0 = user0.Except(user1).ToArray();
+        StaticClass.masIDUsers.Clear();
+        StateHasChanged();
+    }
+
+    //изменить на на тех кто есть
+    private async void Buy10()// редактировать текущий чат
+    {
+        if (chatspozition != null)
+        {
+            StaticClass.user0.Clear();
+            var response = await client.GetFromJsonAsync<_String>($"/Chats/ChatUsers?IDChat={chatspozition}");
+            string user = response.txt;
+            var response2 = await client.GetFromJsonAsync<_String>($"/Users/Taketherest?masUsers2={user}");
+            string user3 = response2.txt;
+            string[] user4 = user3.Split(' ');
+            int j = 1;
+            if (user4.Length != 0)
+            {
+                foreach (var i in user4)
+                {
+                    var response3 = await client.GetFromJsonAsync<_String>($"/Users/AboutClient?ID={i}");
+                    string user5 = response3.txt;
+                    string[] user6 = user5.Split(' ');
+                    user2 user2 = new user2() { Id = j, IDUsers = user6[0], Name = user6[1] };
+                    j++;
+                    StaticClass.user0.Add(user2);
+                }
+            }
+            IsModalVisible = 3;
+        }
+        StateHasChanged();
+    }
+
+    private async void Buy12()// редактировать имя чата
+    {
+        if (ChatNewName != "")
+        {
+            var response = await client.GetFromJsonAsync<_String>($"/Chats/ChangeTheName?NewName={ChatNewName}&Chatspozition={chatspozition}");
+            var response2 = chats.FirstOrDefault(x => x.Id.ToString() == chatspozition2);
+            if (response2 != null)
+                response2.Name = ChatNewName;
+            NameChatsTxt = ChatNewName;
+        }
+        StateHasChanged();
+    }
+
+    public class Chats2
+    {
+        public int Id { get; set; }
+
+        public string IdChats { get; set; }
+
+        public string Name { get; set; }
+    }
+
+    public class txt2
+    {
+        public int Id { get; set; }
+
+        public string IDUsers { get; set; }//ID написавшего
+
+        public string Text { get; set; }
+
+        public string Text2 { get; set; }
+    }
+
+    public class user2
+    {
+        public int Id { get; set; }
+
+        public string IDUsers { get; set; }//ID пользователя в бд
+
+        public string Name { get; set; }
+
+    }
+
+    private class Chats
+    {
+        public int ID { get; set; }//ID чата
+        public string Сreator { get; set; }//Создатель чата
+        public string Name { get; set; }//имя чата
+        public string IDUsers { get; set; }//пользователи чата
+    }
+}

@@ -1,0 +1,62 @@
+﻿@page "/EntranceTheLobby"
+@inject HttpClient client
+
+@*<h3>EntranceTheLobby</h3>*@
+<div class="modal-dialog modal-dialog-scrollable left-side-element" style="max-width: 600px; width: 100%; height: 450px;">
+    <div class="modal-content left" style="max-width: 600px; width: 100%; height: 450px;">
+        <table class="table table-striped">
+            <thead class="table-danger table-layout: fixed">
+                <tr>
+                    <th scope="col" style="width: 10%">№</th>
+                    <th scope="col" style="width: 400px">Имя чата</th>
+                    <th scope="col" style="width: 120px"></th>
+                </tr>
+            </thead>
+            @try
+            {
+                @foreach (var item in chats)
+                {
+                    <tbody>
+                        <tr>
+                            <td>
+                                @item.ID
+                            </td>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" style="width: 100px"@onclick="(() => Buy1(item.IDChats))">подать заявку</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                }
+            }
+            catch { }
+        </table>
+    </div>
+</div>
+
+@code {
+    private IList<Chats> chats = new List<Chats>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        chats = await client.GetFromJsonAsync<IList<Chats>>($"/Chats/Chat_Im_Not_In?IDChats={StaticClass.InhichChats}");
+
+
+        StateHasChanged();
+    }
+
+    private async void Buy1(int IDChats)//подать заявку
+    {
+        var v1 = await client.GetFromJsonAsync<_String>($"/Notifications/Create?IDUser={Convert.ToUInt32(StaticClass.ID)}&IDChats={IDChats}");
+    }
+
+    public class Chats
+    {
+        public int ID { get; set; }//ID
+        public int IDChats { get; set; }//ID чата
+        public string Сreator { get; set; }//Создатель чата
+        public string Name { get; set; }//имя чата
+    }
+}

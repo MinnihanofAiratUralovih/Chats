@@ -1,0 +1,155 @@
+﻿@page "/Entrance"
+@inject HttpClient client
+@inject NavigationManager NavigationManager
+
+@*Вход (авторизация и регестрация)*@
+
+@switch (perehot)
+{
+    case 0:
+        {
+            <h1>Авторизация</h1>
+            <div>
+                <div class="form-group">
+                    <label>Введите Login</label>
+                    <br />
+                    <input type="text" name="Login" @bind="Login" />
+                    <span />
+                </div>
+                <div class="form-group">
+                    <label>Введите пароль</label>
+                    <br />
+                    <input type="password" name="Password" @bind="Password" />
+                    <span />
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary" @onclick="Clic1">Войти</button>
+                    @*<button class="btn btn-primary" @onclick="Perehot">Зарегестрироваться</button>*@
+                </div>
+            </div>
+        }
+        break;
+    case 1:
+        {
+            <h1>Регестрация</h1>
+            <div>
+                <div class="form-group">
+                    <div class="btn-group">
+                        <div class="form-group">
+                            <label>Введите Login</label>
+                            <br />
+                            <input type="text" name="Login" @bind="Login" />
+                        </div>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <div class="form-group">
+                            <label>кто вы</label>
+                            <br />
+                            <select id="title" style="width: 200px; height: 25px; " @bind="Status">
+                                <option value="Учитель">Учитель</option>
+                                <option value="Ученик">Ученик</option>
+                                <option value="Родитель">Родитель</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span />
+                </div>
+                <div class="form-group">
+                    <div class="btn-group">
+                        <div class="form-group">
+                            <label>Введите пароль</label>
+                            <br />
+                            <input type="password" name="Password" @bind="Password" />
+                        </div>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <div class="form-group">
+                            <label>Введите имя</label>
+                            <br />
+                            <input type="text" name="Name" @bind="Name" />
+                        </div>
+                    </div>
+                    <span />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" @onclick="Perehot">Авторизоваться</button>
+                    <button class="btn btn-primary" @onclick="Clic3">Сохранить</button>
+                </div>
+            </div>
+        }
+        break;
+    case 2:
+        {
+            <Chatss />
+        }
+        break;
+}
+
+@code
+{
+    private int perehot = 0;
+    private int Login;
+    private int Password;
+    private string Name;
+    private string Status = "Учитель";
+    NavMenu navMenu = new NavMenu();
+
+    private async Task Perehot() => await Task.Run(() => perehot = perehot == 0 ? 1 : 0);
+
+    private async void Clic1()
+    {
+        if (Login != 0 && Password != 0)
+        {
+            string L = Login.ToString(), P = Password.ToString();
+            var response = await client.GetFromJsonAsync<_String>($"/Users/Enter?login={L}&password={P}");
+            string ID = response.txt;
+            if (ID != "false")
+            {
+                perehot = 2;
+                StaticClass.PagePhases = 1;
+                conservation(ID);
+            }
+        }
+    }
+
+    public async void conservation(string ID)
+    {
+        var response = await client.GetFromJsonAsync<_String>($"Users/AboutClient?ID={ID}");
+        string user = response.txt;
+        string[] user2 = user.Split(' ');
+        StaticClass.ID = user2[0];
+        StaticClass.Name = user2[1];
+        StaticClass.Status = user2[2];
+        StaticClass.InhichChats = user2[3];
+        var response2 = await client.GetFromJsonAsync<_String>($"/Contacts/ShowFriends?ID={ID}");
+        StaticClass.Friends = response2.txt;
+        StateHasChanged();
+
+
+        StaticClass.friend = await client.GetFromJsonAsync<IList<Friend>>($"/Users/Select2?j={StaticClass.ID}");
+    }
+
+    private async void Clic3()
+    {
+        if (Name != "" || Login != 0 || Password != 0)
+        {//(1,2,3 учитель, ученик, родитель. 4 администратор)
+            int s = 0;
+            switch (Status)
+            {
+                case "Учитель":
+                    s = 1;
+                    break;
+                case "Ученик":
+                    s = 2;
+                    break;
+                case "Родитель":
+                    s = 3;
+                    break;
+            }
+            string Login1 = Login.ToString();
+            string Password1 = Password.ToString();
+            var response = await client.GetFromJsonAsync<_String>($"/Users/Create?name={Name}&status={s}&login={Login1}&password={Password1}");
+            string ID = response.txt;
+            perehot = 0;
+        }
+        StateHasChanged();
+    }
+}

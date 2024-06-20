@@ -1,0 +1,83 @@
+﻿@page "/fetchdata"
+@using Chats.Shared
+@inject HttpClient client
+
+<h3>Уведомления</h3>
+<div class="modal-dialog modal-dialog-scrollable left-side-element" style="max-width: 1180px; width: 100%; height: 450px;">
+    <div class="modal-content left" style="max-width: 1180px; width: 100%; height: 450px;">
+        <table class="table table-striped">
+            <thead class="table-danger table-layout: fixed">
+                <tr>
+                    <th scope="col" style="width: 10%">№</th>
+                    <th scope="col" style="width: 400px">Имя чата</th>
+                    <th scope="col" style="width: 400px">Имя пользователя</th>
+                    <th scope="col" style="width: 150px"></th>
+                    <th scope="col" style="width: 150px"></th>
+                </tr>
+            </thead>
+            @try
+            {
+                @foreach (var item in notifications)
+                {
+                    <tbody>
+                        <tr>
+                            <td>
+                                @item.ID
+                            </td>
+                            <td>
+                                @item.NameChats
+                            </td>
+                            <td>
+                                @item.IDName
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" style="width: 100px" @onclick="(() => Buy1(item))">принять заявку</button>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" style="width: 100px" @onclick="(() => Buy2(item))">отклонить заявку</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                }
+            }
+            catch { }
+        </table>
+    </div>
+</div>
+
+@code {
+    private IList<Notifications> notifications = new List<Notifications>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        notifications = await client.GetFromJsonAsync<IList<Notifications>>($"/Notifications/GetMy?IDChats={StaticClass.InhichChats}&IDUser={StaticClass.ID}");
+        StateHasChanged();
+    }
+
+    private async void Buy1(Notifications Item)//принять заявку проверить
+    {
+        await client.GetFromJsonAsync<_String>($"/Chats/AddUser?idchat={Item.IDChats}&idUser={Item.IDUser}");
+        await client.GetFromJsonAsync<_String>($"/Users/LogChat?idUser={Item.IDUser}&idchat={Item.IDChats}");
+        await client.GetFromJsonAsync<_String>($"/Notifications/Delete?IDnotification={Item.IDТNotification}");
+        notifications = await client.GetFromJsonAsync<IList<Notifications>>($"/Notifications/GetMy?IDChats={StaticClass.InhichChats}&IDUser={StaticClass.ID}");
+        StateHasChanged();
+    }
+
+    private async void Buy2(Notifications Item)//отклонить заявку проверить
+    {
+        await client.GetFromJsonAsync<_String>($"/Notifications/Delete?IDnotification={Item.IDТNotification}");
+        notifications = await client.GetFromJsonAsync<IList<Notifications>>($"/Notifications/GetMy?IDChats={StaticClass.InhichChats}&IDUser={StaticClass.ID}");
+        StateHasChanged();
+    }
+
+    public class Notifications
+    {
+        public int ID { get; set; }//ID
+        public int IDТNotification { get; set; }//IDNotification 
+        public int IDChats { get; set; }//ID чата
+        public string NameChats { get; set; }//имя чата
+        //public string Сreator { get; set; }//Создатель чата
+        public string IDName { get; set; }//имя подавателя
+        public string IDUser { get; set; }//ID подавателя
+    }
+}
